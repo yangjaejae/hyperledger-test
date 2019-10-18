@@ -53,6 +53,6 @@ services:
       - 7050:7050
     networks:
       - cr_network
-        aliases:
-          - orderer.chainrefund.com
+        #aliases:
+        #- orderer.chainrefund.com
 
