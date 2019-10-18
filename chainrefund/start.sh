@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # compose up
 export CA_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/chainrefundOrg.chainrefund.com/ca && ls *_sk)
