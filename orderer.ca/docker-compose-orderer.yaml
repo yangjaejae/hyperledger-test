@@ -41,8 +41,18 @@ services:
 
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: orderer
+    deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+              condition: on-failure
+            placement:
+                constraints:
+                    - node.hostname == ip-172-31-32-53
     ports:
       - 7050:7050
     networks:
       - cr_network
+        aliases:
+          - orderer.chainrefund.com
 
