@@ -97,9 +97,6 @@ services:
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash
     depends_on:
-      - orderer.chainrefund.com
       - peer0.chainrefundOrg.chainrefund.com
-      - peer0.customsOrg.chainrefund.com
-      - peer0.merchantsOrg.chainrefund.com
     networks:
       - cr_network
