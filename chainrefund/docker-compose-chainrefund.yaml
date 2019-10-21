@@ -44,25 +44,15 @@ services:
       - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/chainrefundOrg.chainrefund.com/peers/peer0.chainrefundOrg.chainrefund.com/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/chainrefundOrg.chainrefund.com/peers/peer0.chainrefundOrg.chainrefund.com/tls:/etc/hyperledger/fabric/tls
+        - ./crypto-config/peerOrganizations/chainrefundOrg.chainrefund.com/peers/peer0.chainrefundOrg.chainrefund.com/msp:/etc/hyperledger/fabric/msp
+        - ./crypto-config/peerOrganizations/chainrefundOrg.chainrefund.com/peers/peer0.chainrefundOrg.chainrefund.com/tls:/etc/hyperledger/fabric/tls
         - peer0.chainrefundOrg.chainrefund.com:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
-    deploy:
-            mode: replicated
-            replicas: 1
-            restart_policy: 
-              condition: on-failure
-            placement:
-                constraints:
-                    - node.hostname == ip-172-31-33-161
     ports:
       - 7051:7051
     networks:
       - cr_network
-        aliases:
-          - peer0.chainrefundOrg.chainrefund.com
 
   couchdb_chainrefund:
     container_name: couchdb_chainrefund
@@ -76,14 +66,6 @@ services:
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
       - "5984:5984"
-    deploy:
-            mode: replicated
-            replicas: 1
-            restart_policy:
-              condition: on-failure
-            placement:
-                constraints:
-                    - node.hostname == ip-172-31-33-161
     networks:
       - cr_network
 
@@ -108,7 +90,7 @@ services:
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/chainrefundOrg.chainrefund.com/users/Admin@chainrefundOrg.chainrefund.com/msp
     volumes:
         - /var/run/:/host/var/run/
-        - ./../chaincode/:/opt/gopath/src/github.com/chaincode
+        - ./chaincode/:/opt/gopath/src/github.com/chaincode
         - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
         - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
         - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
