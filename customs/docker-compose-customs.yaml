@@ -3,18 +3,20 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-version: '2'
+version: '3.4'
 
 volumes:
-  peer0.customsOrg.chainrefund.com:
+  customsOrg:
 
 networks:
   cr_network:
+     external:
+        name: cr_network
 
 services:
 
-  peer0.customsOrg.chainrefund.com:
-    container_name: peer0.customsOrg.chainrefund.com
+  customsOrg:
+    container_name: customsOrg
     image: hyperledger/fabric-peer:1.4
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -45,15 +47,25 @@ services:
       - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
     volumes:
         - /var/run/:/host/var/run/
-        - ./crypto-config/peerOrganizations/customsOrg.chainrefund.com/peers/peer0.customsOrg.chainrefund.com/msp:/etc/hyperledger/fabric/msp
-        - ./crypto-config/peerOrganizations/customsOrg.chainrefund.com/peers/peer0.customsOrg.chainrefund.com/tls:/etc/hyperledger/fabric/tls
+        - ~/crypto-config/peerOrganizations/customsOrg.chainrefund.com/peers/peer0.customsOrg.chainrefund.com/msp:/etc/hyperledger/fabric/msp
+        - ~/crypto-config/peerOrganizations/customsOrg.chainrefund.com/peers/peer0.customsOrg.chainrefund.com/tls:/etc/hyperledger/fabric/tls
         - peer0.customsOrg.chainrefund.com:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
+    deploy:
+       mode: replicated
+       replicas: 1
+       restart_policy:
+          condition: on-failure
+       placement:
+           constraints:
+              - node.hostname == ip-172-31-47-47
     ports:
-      - 9051:9051
+       - 9051:9051
     networks:
-      - cr_network
+       cr_network:
+          aliases:
+             - customsOrg
 
   couchdb_customs:
     container_name: couchdb_customs
@@ -65,8 +77,16 @@ services:
       - COUCHDB_PASSWORD=
     # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
     # for example map it to utilize Fauxton User Interface in dev environments.
+    deploy:
+       mode: replicated
+       replicas: 1
+       restart_policy:
+          condition: on-failure
+       placement:
+          constraints:
+             - node.hostname == ip-172-31-47-47
     ports:
-      - "6984:5984"
+       - "6984:5984"
     networks:
-      - cr_network
+       - cr_network
 

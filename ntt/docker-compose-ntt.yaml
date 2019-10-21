@@ -3,18 +3,20 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-version: '2'
+version: '3.4'
 
 volumes:
-  peer0.nttOrg.chainrefund.com:
+  nttOrg:
 
 networks:
   cr_network:
+     external:
+        name: cr_network
 
 services:
 
-  peer0.nttOrg.chainrefund.com:
-    container_name: peer0.nttOrg.chainrefund.com
+  nttOrg:
+    container_name: nttOrg
     image: hyperledger/fabric-peer:1.4
     environment:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -45,15 +47,25 @@ services:
       - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
     volumes:
         - /var/run/:/host/var/run/
-        - ./crypto-config/peerOrganizations/nttOrg.chainrefund.com/peers/peer0.nttOrg.chainrefund.com/msp:/etc/hyperledger/fabric/msp
-        - ./crypto-config/peerOrganizations/nttOrg.chainrefund.com/peers/peer0.nttOrg.chainrefund.com/tls:/etc/hyperledger/fabric/tls
+        - ~/crypto-config/peerOrganizations/nttOrg.chainrefund.com/peers/peer0.nttOrg.chainrefund.com/msp:/etc/hyperledger/fabric/msp
+        - ~/crypto-config/peerOrganizations/nttOrg.chainrefund.com/peers/peer0.nttOrg.chainrefund.com/tls:/etc/hyperledger/fabric/tls
         - peer0.nttOrg.chainrefund.com:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
+    deploy:
+       mode: replicated
+       replicas: 1
+       restart_policy:
+          condition: on-failure
+       placement:
+          constraints:
+             - node.hostname == ip-172-31-40-83
     ports:
-      - 11051:11051
+       - 11051:11051
     networks:
-      - cr_network
+       cr_network:
+          aliases:
+             - nttOrg
 
   couchdb_ntt:
     container_name: couchdb_ntt
@@ -65,8 +77,16 @@ services:
       - COUCHDB_PASSWORD=
     # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
     # for example map it to utilize Fauxton User Interface in dev environments.
+    deploy:
+       mode: replicated
+       replicas: 1
+       restart_policy:
+          condition: on-failure
+       placement:
+          constraints:
+             - node.hostname == ip-172-31-40-83
     ports:
-      - "6984:5984"
+       - "8984:5984"
     networks:
-      - cr_network
+       - cr_network
 
