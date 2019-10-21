@@ -90,3 +90,31 @@ services:
     networks:
        - cr_network
 
+  zookeeper.customs.com:
+    container_name: zookeeper.customs.com
+    image: hyperledger/fabric-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 32182
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+    - cr_network
+
+  kafka.customs.com:
+    container_name: kafka.customs.com
+    image: hyperledger/fabric-kafka
+    depends_on:
+    - zookeeper.customs.com
+    environment:
+      - KAFKA_BROKER_ID=2
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper.customs.com:2182
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka.customs.com:9093
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_MESSAGE_MAX_BYTES=1048576 # 1 * 1024 * 1024 B
+      - KAFKA_REPLICA_FETCH_MAX_BYTES=1048576 # 1 * 1024 * 1024 B
+      - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
+      - KAFKA_LOG_RETENTION_MS=-1
+      - KAFKA_MIN_INSYNC_REPLICAS=1
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=1
+    networks:
+    - cr_network
+
