@@ -45,25 +45,15 @@ services:
       - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/merchantsOrg.chainrefund.com/peers/peer0.merchantsOrg.chainrefund.com/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/merchantsOrg.chainrefund.com/peers/peer0.merchantsOrg.chainrefund.com/tls:/etc/hyperledger/fabric/tls
+        - ./crypto-config/peerOrganizations/merchantsOrg.chainrefund.com/peers/peer0.merchantsOrg.chainrefund.com/msp:/etc/hyperledger/fabric/msp
+        - ./crypto-config/peerOrganizations/merchantsOrg.chainrefund.com/peers/peer0.merchantsOrg.chainrefund.com/tls:/etc/hyperledger/fabric/tls
         - peer0.merchantsOrg.chainrefund.com:/var/hyperledger/production
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: peer node start
-    deploy:
-            mode: replicated
-            replicas: 1
-            restart_policy:
-              condition: on-failure
-            placement:
-                constraints:
-                    - node.hostname == ip-172-31-40-38
     ports:
-      -10051:10051
+      - 10051:10051
     networks:
       - cr_network
-        aliases:
-          - peer0.merchantsOrg.chainrefund.com
 
   couchdb_merchants:
     container_name: couchdb_merchants
@@ -75,14 +65,6 @@ services:
       - COUCHDB_PASSWORD=
     # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
     # for example map it to utilize Fauxton User Interface in dev environments.
-    deploy:
-            mode: replicated
-            replicas: 1
-            restart_policy:
-              condition: on-failure
-            placement:
-                constraints:
-                    - node.hostname == ip-172-31-40-38
     ports:
       - "6984:5984"
     networks:
