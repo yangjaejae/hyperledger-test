@@ -22,18 +22,8 @@ services:
     volumes:
       - ./crypto-config/peerOrganizations/chainrefundOrg.chainrefund.com/ca/:/etc/hyperledger/fabric-ca-server-config
     command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.chainrefundOrg.chainrefund.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/${CA_PRIVATE_KEY} -b chainrefund:chain2018 -d'
-    deploy:
-            mode: replicated
-            replicas: 1
-            restart_policy:
-              condition: on-failure
-            placement:
-                constraints:
-                    - node.hostname == ip-172-31-32-53
     ports:
       - "7054:7054"
     networks:
       - cr_network
-        aliases:
-          - ca.chainrefund.com
 
